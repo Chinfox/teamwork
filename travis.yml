@@ -1,0 +1,22 @@
+sudo: false
+
+language: node_js
+
+node_js:
+  - 10
+
+install:
+  - npm ci
+
+cache:
+  directories:
+    - "$HOME/.npm"
+
+script:
+  - npm test
+
+after_success:
+  - npm run coverage
+
+notifications:
+  email: false
