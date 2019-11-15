@@ -1,6 +1,8 @@
 /* eslint-disable no-restricted-globals */
 const http = require('http');
 
+const app = require('./api/app');
+
 /**
  *  normalizePort returns a valid port whether provided as string
  *  or number
@@ -20,16 +22,16 @@ const normalizePort = (val) => {
   return false;
 };
 
-const port = normalizePort(process.env.PORT || 4000);
+const port = normalizePort(process.env.PORT || '4000');
+
+app.set('port', port);
 
 /**
  *  errorHandler checks some common system errors and handles them properly
  */
 
-//  create an HTTP server object
-const server = http.createServer((req, res) => {
-  res.end('server responding');
-});
+//  create an HTTP Express server
+const server = http.createServer(app);
 
 const errorHandler = (error) => {
   if (error.syscall !== 'listen') {
@@ -58,3 +60,5 @@ server.on('listening', () => {
   const bind = typeof address === 'string' ? `pipe ${address}` : `port: ${port}`;
   console.log(`server listening on ${bind}`);
 });
+
+server.listen(port);
