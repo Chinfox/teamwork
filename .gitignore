@@ -10,3 +10,5 @@ npm-debug.log
 coverage
 bash.exe.stackdump
 .nyc_output
+
+archive/
