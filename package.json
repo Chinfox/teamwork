@@ -8,7 +8,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node app.js",
-    "setup-DB": "node ./api/db/setup.js",
+    "setup-db": "node ./api/db/setup.js",
     "start-dev": "nodemon app.js",
     "test:mocha": "mocha test/**/*.spec.js --exit",
     "test": "nyc --reporter=html --reporter=text mocha test/**/*.spec.js --timeout=3000 --exit",
@@ -39,7 +39,8 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.2",
-    "pg": "^7.12.1"
+    "pg": "^7.12.1",
+    "validator": "12.1.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",

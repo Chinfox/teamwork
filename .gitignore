@@ -1,5 +1,5 @@
-# Node build artifacts
-node_modules/
+# node modules
+node_modules
 npm-debug.log
 
 # Local development
@@ -11,4 +11,6 @@ coverage
 bash.exe.stackdump
 .nyc_output
 
-archive/
+archive
+
+api/db/setup.js

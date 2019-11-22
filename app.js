@@ -23,7 +23,7 @@ app.use(
 
 
 app.post('/api/v1/users', userController.createUser);
-app.get('/api/v1/users', userController.login);
+// app.get('/api/v1/users', userController.login);
 
 app.use('/', (req, res) => {
   res.json({ message: 'Welcome to the Teamwork API !' });
