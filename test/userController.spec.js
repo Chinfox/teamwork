@@ -2,6 +2,8 @@ const { expect } = require('chai');
 
 const sinon = require('sinon');
 
+const bcrypt = require('bcrypt');
+
 const userController = require('../api/controllers/userController');
 const db = require('../api/db/helper');
 // const queries = require('../api/db/queries');
@@ -32,7 +34,7 @@ describe('User', () => {
 
       // create a stub to fake the query and a part of server response
       const stubDB = sinon.stub(db, 'queryDB');
-      stubDB.returns(Promise.resolve({ rowCount: 1 }));
+      stubDB.returns(Promise.resolve({ rows: [{ userid: 183, isAdmin: false }] }));
 
       await userController.createUser(req, res);
 
