@@ -5,12 +5,14 @@
   "engines": {
     "node": "10.x"
   },
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "start-dev": "nodemon server.js",
+    "start": "node app.js",
+    "setup-db": "node ./api/db/setup.js",
+    "start-dev": "nodemon app.js",
+    "test:mocha": "mocha test/**/*.spec.js --exit",
     "test": "nyc --reporter=html --reporter=text mocha test/**/*.spec.js --timeout=3000 --exit",
-    "lint": "eslint . --fix",
+    "lint": "eslint .",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
@@ -30,12 +32,15 @@
   "homepage": "https://github.com/Chinfox/teamwork#readme",
   "dependencies": {
     "bcrypt": "^3.0.6",
-    "body-passer": "^1.0.0",
+    "body-parser": "^1.19.0",
+    "chai-http": "^4.3.0",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.2",
-    "pg": "^7.12.1"
+    "pg": "^7.12.1",
+    "validator": "12.1.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -55,8 +60,7 @@
     ],
     "delay": "2500",
     "env": {
-      "NODE_ENV": "development",
-      "PORT": 5000
+      "NODE_ENV": "development"
     }
   }
 }
