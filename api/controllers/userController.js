@@ -70,7 +70,7 @@ const signIn = async (req, res) => {
     const newToken = createToken(user);
 
     // return if password invalid
-    if (!isPassword) {
+    if (!isPassword && result.rowCount === 1) {
       res.status(401);
       return res.json({
         status: 'error',
