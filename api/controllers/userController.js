@@ -65,16 +65,12 @@ const signIn = async (req, res) => {
       });
     }
 
-    const { rowCount } = result;
-    console.log(rowCount);
     const [user] = result.rows;
     const isPassword = await bcrypt.compare(password, user.password);
     const newToken = createToken(user);
 
     // return if password invalid
     if (!isPassword) {
-      console.log('2', isPassword);
-      console.log('empty row');
       res.status(401);
       return res.json({
         status: 'error',
@@ -93,7 +89,6 @@ const signIn = async (req, res) => {
     });
     // }
   } catch (error) {
-    console.log('this is an error', error);
     res.status(500);
     return res.json({
       status: 'error',

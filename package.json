@@ -11,7 +11,7 @@
     "setup-db": "node ./api/db/setup.js",
     "start-dev": "nodemon app.js",
     "test:mocha": "mocha test/**/*.spec.js --exit",
-    "test": "nyc --reporter=html --reporter=text mocha test/**/*.spec.js --timeout=3000 --exit",
+    "test": "nyc --reporter=html --reporter=text mocha test/**/*.spec.js --exit",
     "lint": "eslint .",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },

@@ -84,7 +84,7 @@ describe('User', () => {
 
       await userController.signIn(req, res);
 
-      // assertions for server error
+      // assertions for successful login
       expect(res.status.calledOnce).to.equal(true);
       expect(res.json.calledOnce).to.equal(true);
       expect(res.status.args[0][0]).to.equal(200);
