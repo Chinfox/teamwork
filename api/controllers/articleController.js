@@ -74,7 +74,36 @@ const edit = async (req, res) => {
   }
 };
 
+const remove = async (req, res) => {
+  const id = parseInt(req.params.articleId, 10);
+
+  const query = {
+    text: 'DELETE FROM articles WHERE articleId = $1',
+    values: [id],
+  };
+  // console.log(id);
+  try {
+    await client.query(query.text, query.values);
+
+    res.status(200);
+    return res.json({
+      status: 'success',
+      data: {
+        message: 'Article successfully deleted',
+      },
+    });
+  } catch (error) {
+    console.log();
+    res.status(500);
+    return res.json({
+      status: 'error',
+      error: 'Unable to delete article. please retry after a while',
+    });
+  }
+};
+
 module.exports = {
   create,
   edit,
+  remove,
 };
