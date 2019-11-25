@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || '4000';
-const userController = require('./api/controllers/userController');
+const userRoutes = require('./api/routes/userRoute');
 
 app.use(cors());
 
@@ -22,7 +22,7 @@ app.use(
 );
 
 
-app.post('/api/v1/users', userController.createUser);
+app.use('/api/v1/users', userRoutes);
 
 app.use('/', (req, res) => {
   res.json({ message: 'Welcome to the Teamwork API !' });
