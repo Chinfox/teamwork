@@ -1,19 +1,23 @@
 const bcrypt = require('bcrypt');
 const client = require('../db/connector');
-const { createToken, verifyToken } = require('../lib/token');
+const { createToken } = require('../lib/token');
 
 const createUser = async (req, res) => {
   const {
     firstName, lastName, email, password, gender, jobRole, department, address,
   } = req.body;
 
+  // convert email to lowercase to avoid query errors
+  const userEmail = email.toLowerCase();
+
+  // encrypt password
   const hash = await bcrypt.hash(password, 10);
 
   const query = {
     text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-            RETURNING userId`,
-    values: [firstName, lastName, email, hash, gender, jobRole, department, address],
+            RETURNING userId, isAdmin`,
+    values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
   };
 
   try {
@@ -21,7 +25,7 @@ const createUser = async (req, res) => {
     // console.log(result);
     const [user] = result.rows;
     const newToken = createToken(user);
-    const decodedToken = verifyToken(newToken);
+    // const decodedToken = verifyToken(newToken);
 
     res.status(201);
     return res.json({
@@ -29,7 +33,6 @@ const createUser = async (req, res) => {
       data: {
         message: 'User account successfully created',
         token: newToken,
-        verify: decodedToken,
         userId: user.userid,
       },
     });
@@ -43,6 +46,63 @@ const createUser = async (req, res) => {
   }
 };
 
+const signIn = async (req, res) => {
+  const { email, password } = req.body;
+  const query = {
+    text: 'SELECT userId, password, isAdmin FROM users WHERE (email = $1)',
+    values: [email],
+  };
+
+  try {
+    const result = await client.query(query.text, query.values);
+
+    // return if email is not found
+    if (result.rowCount === 0) {
+      res.status(401);
+      return res.json({
+        status: 'error',
+        error: 'User email not registered',
+      });
+    }
+
+    const { rowCount } = result;
+    console.log(rowCount);
+    const [user] = result.rows;
+    const isPassword = await bcrypt.compare(password, user.password);
+    const newToken = createToken(user);
+
+    // return if password invalid
+    if (!isPassword) {
+      console.log('2', isPassword);
+      console.log('empty row');
+      res.status(401);
+      return res.json({
+        status: 'error',
+        error: 'Password incorrect',
+      });
+    }
+
+    // if (isPassword && result.rowCount === 1) {
+    res.status(200);
+    return res.json({
+      status: 'success',
+      data: {
+        token: newToken,
+        userId: user.userid,
+      },
+    });
+    // }
+  } catch (error) {
+    console.log('this is an error', error);
+    res.status(500);
+    return res.json({
+      status: 'error',
+      error: 'Signin not successful. Please retry after a while',
+    });
+  }
+};
+
 module.exports = {
   createUser,
+  signIn,
 };
