@@ -25,7 +25,7 @@ describe('User', () => {
 
       // create a stub to fake the query and server response
       const stubDB = sinon.stub(client, 'query');
-      stubDB.returns(Promise.resolve({ rows: [{ userid: 183, isAdmin: false }] }));
+      stubDB.returns(Promise.resolve({ rows: [{ userid: 183, isadmin: false }] }));
 
       await userController.createUser(req, res);
 
@@ -79,7 +79,7 @@ describe('User', () => {
       const stubDB = sinon.stub(client, 'query');
       stubDB.returns(Promise.resolve({
         rowCount: 1,
-        rows: [{ password: '$2b$10$/JkIawP50ZQdrNNP.k31kuOs7LPWwh1PD0N9MhtfoHi0ha8inlMyC' }],
+        rows: [{ userid: 183, isadmin: false, password: '$2b$10$/JkIawP50ZQdrNNP.k31kuOs7LPWwh1PD0N9MhtfoHi0ha8inlMyC' }],
       }));
 
       await userController.signIn(req, res);

@@ -16,7 +16,7 @@ describe('User', () => {
         body: {
           title: 'Beans',
           article: 'A food',
-          authorId: 1,
+          userId: 1,
         },
       };
       const res = {
@@ -42,7 +42,7 @@ describe('User', () => {
         body: {
           title: 'Rice',
           article: 'Also a food',
-          authorId: 12,
+          userId: 12,
         },
       };
       const res = {
@@ -55,6 +55,62 @@ describe('User', () => {
       stubDB.returns(Promise.reject(new Error('error')));
 
       await articleController.create(req, res);
+
+      // assertions for server error
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(500);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'error');
+    });
+  });
+
+  describe('PATCH /articles', () => {
+    it('Article author should be able to edit an article', async () => {
+      const req = {
+        params: { articleId: '2' },
+        body: {
+          title: 'Beans',
+          article: 'A food',
+          userId: 1,
+        },
+      };
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.returns(Promise.resolve({ rows: [{ title: 'Beans', article: 'An edit' }] }));
+
+      await articleController.edit(req, res);
+
+      // assertions for successful UPDATE
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(200);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
+    });
+
+    it('should handle server error', async () => {
+      const req = {
+        params: { articleId: '2' },
+        body: {
+          title: 'Rice',
+          article: 'Also a food',
+          authorId: 12,
+        },
+      };
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.returns(Promise.reject(new Error('error')));
+
+      await articleController.edit(req, res);
 
       // assertions for server error
       expect(res.status.calledOnce).to.equal(true);
