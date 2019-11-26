@@ -64,8 +64,8 @@ describe('Article', () => {
     });
   });
 
-  describe('PATCH /articles/:Id', () => {
-    it('should be able to edit an article', async () => {
+  describe('PATCH /articles/:id', () => {
+    it('should be able to edit an article by id', async () => {
       const req = {
         params: { id: '2' },
         body: {
@@ -118,8 +118,8 @@ describe('Article', () => {
     });
   });
 
-  describe('DELETE /articles/:Id', () => {
-    it('should be able to delete an article', async () => {
+  describe('DELETE /articles/:id', () => {
+    it('should be able to delete an article by id', async () => {
       const req = {
         params: { id: '2' },
       };
@@ -164,8 +164,8 @@ describe('Article', () => {
     });
   });
 
-  describe('POST /articles', () => {
-    it('should create a new article', async () => {
+  describe('POST /articles/:id/comment', () => {
+    it('should comment on an article', async () => {
       const req = {
         params: { id: '2' },
         body: {
@@ -185,7 +185,7 @@ describe('Article', () => {
 
       await articleController.makeComment(req, res);
 
-      // assertions for successful INSERTION
+      // assertions for successful comment
       expect(res.status.calledOnce).to.equal(true);
       expect(res.json.calledOnce).to.equal(true);
       expect(res.status.args[0][0]).to.equal(201);
@@ -196,8 +196,7 @@ describe('Article', () => {
       const req = {
         params: { id: '3' },
         body: {
-          title: 'Rice',
-          article: 'Also a food',
+          comment: 'A good food',
           userId: 12,
         },
       };
@@ -220,4 +219,62 @@ describe('Article', () => {
     });
   });
 
+  describe('GET /articles/:id', () => {
+    it('should get an article by id', async () => {
+      const req = {
+        params: { id: '22' },
+      };
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.withArgs('SELECT * FROM articles WHERE (articleId = $1)', [22]).returns(Promise.resolve({
+        rows: [{
+          articleid: 22, title: 'Beans', article: 'oh beans oh beans', createdon: '2019-12-12', authorid: 8,
+        }],
+      }));
+
+      stubDB.withArgs('SELECT commentId, comment, authorId FROM comments WHERE (articleId = $1)', [22]).returns(Promise.resolve({
+        rows: [{ commentid: 2, comment: 'oh beans oh beans', authorid: 3 }],
+      }));
+
+      await articleController.getOne(req, res);
+
+      // assertions for successful GET
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(200);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
+    });
+
+    it('should handle server error', async () => {
+      const req = {
+        params: { id: '23' },
+        body: {
+          title: 'Rice',
+          article: 'Also a food',
+          userId: 12,
+        },
+      };
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.returns(Promise.reject(new Error('error')));
+
+      await articleController.getOne(req, res);
+
+      // assertions for server error
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(500);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'error');
+    });
+  });
 });

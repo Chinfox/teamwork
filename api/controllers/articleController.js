@@ -149,49 +149,51 @@ const makeComment = async (req, res) => {
   }
 };
 
+const getOne = async (req, res) => {
+  const id = parseInt(req.params.id, 10);
 
-// const getOne = async (req, res) => {
-//   const id = parseInt(req.params.id, 10);
+  const query1 = {
+    text: 'SELECT * FROM articles WHERE (articleId = $1)',
+    values: [id],
+  };
+  const query2 = {
+    text: 'SELECT commentId, comment, authorId FROM comments WHERE (articleId = $1)',
+    values: [id],
+  };
 
-//   const query1 = {
-//     text: 'SELECT * FROM articles WHERE id = $1',
-//     values: [id],
-//   };
-//   const query2 = {
-//     text: 'SELECT * FROM comments WHERE articleId = $1',
-//     values: [id],
-//   };
+  try {
+    const result1 = await client.query(query1.text, query1.values);
+    const result2 = await client.query(query2.text, query2.values);
 
-//   try {
-//     const article = await client.query(query1.text, query1.values);
-//     const comments = await client.query(query2.text, query2.values);
+    const [article] = result1.rows;
+    const comments = result2.rows;
 
-//     // console.log(result);
-//     const [data] = result.rows;
-
-//     res.status(201);
-//     return res.json({
-//       status: 'success',
-//       data: {
-//         message: 'Article successfully posted',
-//         articleId: data.articleid,
-//         createdOn: data.createdon,
-//         title: data.title,
-//       },
-//     });
-//   } catch (error) {
-//     console.log();
-//     res.status(500);
-//     return res.json({
-//       status: 'error',
-//       error: 'Unable to fetch article. please retry after a while',
-//     });
-//   }
-// };
+    res.status(200);
+    return res.json({
+      status: 'success',
+      data: {
+        id: article.articleid,
+        createdOn: article.createdon,
+        title: article.title,
+        article: article.article,
+        authorId: article.authorid,
+        comments,
+      },
+    });
+  } catch (error) {
+    console.log();
+    res.status(500);
+    return res.json({
+      status: 'error',
+      error: 'Unable to fetch article. please retry after a while',
+    });
+  }
+};
 
 module.exports = {
   create,
   edit,
   remove,
   makeComment,
+  getOne,
 };
