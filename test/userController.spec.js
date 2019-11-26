@@ -14,8 +14,14 @@ describe('User', () => {
     it('should be able to create a user account', async () => {
       const req = {
         body: {
+          firstName: 'uba',
+          lastName: 'nema',
           email: 'fn@gmail',
           password: '9023DDD',
+          gender: 'male',
+          jobRole: 'accountant',
+          department: 'accounts',
+          address: 'abuja',
         },
       };
       const res = {
