@@ -9,15 +9,15 @@ const createUser = async (req, res) => {
 
   // convert email to lowercase to avoid query errors
   const userEmail = email.toLowerCase();
-  let hash;
 
   // encrypt password
-  // const hash = await bcrypt.hash(password, 10);
-  await bcrypt.hash(password, 10)
-    .then((PasswordHash) => {
-      hash = PasswordHash;
-      return hash;
-    });
+  const hash = await bcrypt.hash(password, 10);
+  // let hash;
+  // await bcrypt.hash(password, 10)
+  //   .then((PasswordHash) => {
+  //     hash = PasswordHash;
+  //     return hash;
+  //   });
 
   const query = {
     text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
