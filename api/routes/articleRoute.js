@@ -5,7 +5,9 @@ const router = express.Router();
 const articleController = require('../controllers/articleController');
 
 router.post('/', articleController.create);
-router.patch('/:articleId', articleController.edit);
-router.delete('/:articleId', articleController.remove);
+// router.get('/:id', articleController.getOne);
+router.patch('/:id', articleController.edit);
+router.delete('/:id', articleController.remove);
+router.post('/:id/comment', articleController.makeComment);
 
 module.exports = router;

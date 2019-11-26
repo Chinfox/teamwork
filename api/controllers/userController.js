@@ -9,9 +9,15 @@ const createUser = async (req, res) => {
 
   // convert email to lowercase to avoid query errors
   const userEmail = email.toLowerCase();
+  let hash;
 
   // encrypt password
-  const hash = await bcrypt.hash(password, 10);
+  // const hash = await bcrypt.hash(password, 10);
+  await bcrypt.hash(password, 10)
+    .then((PasswordHash) => {
+      hash = PasswordHash;
+      return hash;
+    });
 
   const query = {
     text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
@@ -25,7 +31,6 @@ const createUser = async (req, res) => {
     // console.log(result);
     const [user] = result.rows;
     const newToken = createToken(user);
-    // const decodedToken = verifyToken(newToken);
 
     res.status(201);
     return res.json({
@@ -46,6 +51,7 @@ const createUser = async (req, res) => {
   }
 };
 
+// eslint-disable-next-line consistent-return
 const signIn = async (req, res) => {
   const { email, password } = req.body;
   const query = {
@@ -55,8 +61,10 @@ const signIn = async (req, res) => {
 
   try {
     const result = await client.query(query.text, query.values);
+    const [user] = result.rows;
+    const newToken = createToken(user);
 
-    // return if email is not found
+    // Return if email is not found
     if (result.rowCount === 0) {
       res.status(401);
       return res.json({
@@ -65,29 +73,26 @@ const signIn = async (req, res) => {
       });
     }
 
-    const [user] = result.rows;
-    const isPassword = await bcrypt.compare(password, user.password);
-    const newToken = createToken(user);
-
-    // return if password invalid
-    if (!isPassword && result.rowCount === 1) {
-      res.status(401);
-      return res.json({
-        status: 'error',
-        error: 'Password incorrect',
+    await bcrypt.compare(password, user.password)
+      .then((valid) => {
+        // Password invalid
+        if (!valid) {
+          res.status(401);
+          return res.json({
+            status: 'error',
+            error: 'Password not correct',
+          });
+        }
+        // Password valid
+        res.status(200);
+        return res.json({
+          status: 'success',
+          data: {
+            token: newToken,
+            userId: user.userid,
+          },
+        });
       });
-    }
-
-    // if (isPassword && result.rowCount === 1) {
-    res.status(200);
-    return res.json({
-      status: 'success',
-      data: {
-        token: newToken,
-        userId: user.userid,
-      },
-    });
-    // }
   } catch (error) {
     res.status(500);
     return res.json({
@@ -101,3 +106,23 @@ module.exports = {
   createUser,
   signIn,
 };
+
+// .then((valid) => {
+//   // Password valid
+//   res.status(200);
+//   return res.json({
+//     status: 'success',
+//     data: {
+//       token: newToken,
+//       userId: user.userid,
+//     },
+//   });
+// })
+// .catch(() => {
+//   // Password invalid
+//   res.status(401);
+//   return res.json({
+//     status: 'error',
+//     error: 'Password not correct',
+//   });
+// });

@@ -11,7 +11,7 @@ describe('User', () => {
   });
 
   describe('POST /auth/create-user', () => {
-    it('only admin should be able to create a user account', async () => {
+    it('should be able to create a user account', async () => {
       const req = {
         body: {
           email: 'fn@gmail',
