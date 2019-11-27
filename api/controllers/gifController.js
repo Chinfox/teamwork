@@ -37,6 +37,53 @@ const create = async (req, res) => {
   }
 };
 
+const makeComment = async (req, res) => {
+  const { comment, userId } = req.body;
+  const id = parseInt(req.params.id, 10);
+  const dateTime = new Date().toLocaleString();
+
+  const query1 = {
+    text: `INSERT INTO comments (comment, gifId, createdOn, authorId)
+            VALUES ($1, $2, $3, $4)
+            RETURNING comment, createdOn`,
+    values: [comment, id, dateTime, userId],
+  };
+
+  const query2 = {
+    text: 'SELECT title FROM gifs WHERE (gifId = $1)',
+    values: [id],
+  };
+
+  try {
+    const result1 = await client.query(query1.text, query1.values);
+    const result2 = await client.query(query2.text, query2.values);
+    // const result2 = await client.query('SELECT FROM WHERE (articleId = $1)', [id]);
+    // console.log(result1);
+    // console.log(result2);
+    const [commentData] = result1.rows;
+    const [gifData] = result2.rows;
+
+    res.status(201);
+    return res.json({
+      status: 'success',
+      data: {
+        message: 'Comment successfully created',
+        createdOn: commentData.createdon,
+        gifTitle: gifData.title,
+        comment: commentData.comment,
+      },
+    });
+  } catch (error) {
+    console.log();
+    res.status(500);
+    return res.json({
+      status: 'error',
+      error: 'Unable to post comment. please retry after a while',
+    });
+  }
+};
+
 module.exports = {
   create,
+  makeComment,
 };

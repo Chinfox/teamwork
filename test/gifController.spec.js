@@ -69,4 +69,59 @@ describe('Gif', () => {
       expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'error');
     });
   });
+
+  describe('POST /gifs/:id/comment', () => {
+    it('should comment on a gif post', async () => {
+      const req = {
+        params: { id: '2' },
+        body: {
+          comment: 'A good pics',
+          userId: 1,
+        },
+      };
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.returns(Promise.resolve({ rows: [{ comment: 'Beans is good', createdOn: '2019-11-11' }] }));
+      stubDB.withArgs('SELECT title, article FROM articles WHERE (gifId = $1)', [2]).returns(Promise.resolve({ rows: [{ title: 'Beans', article: 'oh beans oh beans' }] }));
+
+      await gifController.makeComment(req, res);
+
+      // assertions for successful comment
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(201);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
+    });
+
+    it('should handle server error', async () => {
+      const req = {
+        params: { id: '3' },
+        body: {
+          comment: 'A good food',
+          userId: 12,
+        },
+      };
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.returns(Promise.reject(new Error('error')));
+
+      await gifController.makeComment(req, res);
+
+      // assertions for server error
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(500);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'error');
+    });
+  });
 });
