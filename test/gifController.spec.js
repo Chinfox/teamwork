@@ -124,4 +124,58 @@ describe('Gif', () => {
       expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'error');
     });
   });
+
+  describe('GET /gifs/:id', () => {
+    it('should get a gif by id', async () => {
+      const req = {
+        params: { id: '22' },
+      };
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.withArgs('SELECT * FROM gifs WHERE (gifId = $1)', [22]).returns(Promise.resolve({
+        rows: [{
+          gifid: 22, title: 'Beans', imageurl: 'http://something', createdon: '2019-12-12', authorid: 10,
+        }],
+      }));
+
+      stubDB.withArgs('SELECT commentId, comment, authorId FROM comments WHERE (gifId = $1)', [22]).returns(Promise.resolve({
+        rows: [{ commentid: 2, comment: 'oh beans oh beans', authorid: 3 }],
+      }));
+
+      await gifController.getOne(req, res);
+
+      // assertions for successful GET
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(200);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
+    });
+
+    it('should handle server error', async () => {
+      const req = {
+        params: { id: '23' },
+      };
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.returns(Promise.reject(new Error('error')));
+
+      await gifController.getOne(req, res);
+
+      // assertions for server error
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(500);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'error');
+    });
+  });
 });
