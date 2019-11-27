@@ -13,6 +13,7 @@ cloudinary.config({
 const add = async (req, res, next) => {
   const file = req.files.image;
 
+
   if (file.mimetype !== 'image/gif') {
     res.status(400);
     return res.json({
@@ -36,14 +37,23 @@ const add = async (req, res, next) => {
     });
 };
 
-// const remove = () => {
-
-// };
-
-// cloudinary.uploader.upload("sample.jpg", {"crop":"limit","tags":"samples","width"
-// :3000,"height":2000}, function(result) { console.log(result) });
-// cloudinary://139187219659792:X4mgFoFakywk6X7U-FyMmYYXdEM@owi/
+const remove = async (req, res, next) => {
+  cloudinary.uploader.destroy(req.body.publicId)
+    .then((result) => {
+      console.log(`image in cloud deleted: ${result}`);
+      return next();
+    })
+    .catch((error) => {
+      console.log('errorR', error);
+      res.status(500);
+      return res.json({
+        status: 'error',
+        error: 'Gif delete failed please retry after a while',
+      });
+    });
+};
 
 module.exports = {
   add,
+  remove,
 };

@@ -124,8 +124,37 @@ const getOne = async (req, res) => {
   }
 };
 
+const remove = async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+
+  const query = {
+    text: 'DELETE FROM gifs WHERE gifId = $1',
+    values: [id],
+  };
+  // console.log(id);
+  try {
+    await client.query(query.text, query.values);
+
+    res.status(200);
+    return res.json({
+      status: 'success',
+      data: {
+        message: 'gif post successfully deleted',
+      },
+    });
+  } catch (error) {
+    console.log();
+    res.status(500);
+    return res.json({
+      status: 'error',
+      error: 'Unable to delete gif. please retry after a while',
+    });
+  }
+};
+
 module.exports = {
   create,
   makeComment,
   getOne,
+  remove,
 };
