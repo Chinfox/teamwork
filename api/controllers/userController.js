@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const bcrypt = require('bcrypt');
 const client = require('../db/connector');
 const { createToken } = require('../lib/token');
@@ -38,7 +39,7 @@ const createUser = async (req, res) => {
     // console.log(result);
     const [user] = result.rows;
     const newToken = createToken(user);
-    console.log(verifyToken(newToken));
+    // console.log(verifyToken(newToken));
 
     res.status(201);
     return res.json({
@@ -71,7 +72,7 @@ const signIn = async (req, res) => {
     const result = await client.query(query.text, query.values);
     const [user] = result.rows;
     const newToken = createToken(user);
-    console.log(verifyToken(newToken));
+    // console.log(verifyToken(newToken));
 
     // Return if email is not found
     if (result.rowCount === 0) {
