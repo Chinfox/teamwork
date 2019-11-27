@@ -11,7 +11,7 @@ const create = async (req, res) => {
             RETURNING gifId, title, createdOn, imageUrl`,
     values: [title, imageUrl, dateTime, publicId, userId],
   };
-  // console.log(query);
+  console.log(query);
   try {
     const result = await client.query(query.text, query.values);
     const [data] = result.rows;
@@ -63,6 +63,14 @@ const makeComment = async (req, res) => {
     const [commentData] = result1.rows;
     const [gifData] = result2.rows;
 
+    if (result2.rowCount === 0) {
+      res.status(404);
+      return res.json({
+        status: 'error',
+        error: 'Gif does not exist',
+      });
+    }
+
     res.status(201);
     return res.json({
       status: 'success',
@@ -101,6 +109,14 @@ const getOne = async (req, res) => {
 
     const [gif] = result1.rows;
     const comments = result2.rows;
+
+    if (result1.rowCount === 0) {
+      res.status(404);
+      return res.json({
+        status: 'error',
+        error: 'Gif does not exist',
+      });
+    }
 
     res.status(200);
     return res.json({
@@ -152,9 +168,37 @@ const remove = async (req, res) => {
   }
 };
 
+const getAll = async (req, res) => {
+  const query = {
+    text: 'SELECT gifId, createdOn, title, Imageurl, authorId FROM gifs ORDER BY createdOn DESC',
+    values: [],
+  };
+
+  try {
+    const result = await client.query(query.text, query.values);
+
+    // Array of gif data
+    const gifs = result.rows;
+
+    res.status(200);
+    return res.json({
+      status: 'success',
+      data: gifs,
+    });
+  } catch (error) {
+    console.log();
+    res.status(500);
+    return res.json({
+      status: 'error',
+      error: 'Unable to fetch all gifs. please retry after a while',
+    });
+  }
+};
+
 module.exports = {
   create,
   makeComment,
   getOne,
   remove,
+  getAll,
 };

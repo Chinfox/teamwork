@@ -128,6 +128,15 @@ const makeComment = async (req, res) => {
     const [commentData] = result1.rows;
     const [articleData] = result2.rows;
 
+    // Return if gif is not found
+    if (result2.rowCount === 0) {
+      res.status(404);
+      return res.json({
+        status: 'error',
+        error: 'Article does not exist',
+      });
+    }
+
     res.status(201);
     return res.json({
       status: 'success',
@@ -168,6 +177,14 @@ const getOne = async (req, res) => {
     const [article] = result1.rows;
     const comments = result2.rows;
 
+    if (result1.rowCount === 0) {
+      res.status(404);
+      return res.json({
+        status: 'error',
+        error: 'Article does not exist',
+      });
+    }
+
     res.status(200);
     return res.json({
       status: 'success',
@@ -190,10 +207,38 @@ const getOne = async (req, res) => {
   }
 };
 
+const getAll = async (req, res) => {
+  const query = {
+    text: 'SELECT articleId, createdOn, title, article, authorId FROM articles ORDER BY createdOn DESC',
+    values: [],
+  };
+
+  try {
+    const result = await client.query(query.text, query.values);
+
+    // Array of article data
+    const articles = result.rows;
+
+    res.status(200);
+    return res.json({
+      status: 'success',
+      data: articles,
+    });
+  } catch (error) {
+    console.log();
+    res.status(500);
+    return res.json({
+      status: 'error',
+      error: 'Unable to fetch all articles. please retry after a while',
+    });
+  }
+};
+
 module.exports = {
   create,
   edit,
   remove,
   makeComment,
   getOne,
+  getAll,
 };

@@ -11,7 +11,7 @@ const createUser = async (req, res) => {
   const userEmail = email.toLowerCase();
 
   // encrypt password
-  const hash = await bcrypt.hash(password, 10);
+  // const hash = await bcrypt.hash(password, 10);
   // let hash;
   // await bcrypt.hash(password, 10)
   //   .then((PasswordHash) => {
@@ -19,18 +19,26 @@ const createUser = async (req, res) => {
   //     return hash;
   //   });
 
-  const query = {
-    text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-            RETURNING userId, isAdmin`,
-    values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
-  };
+  // const query = {
+  //   text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
+  //           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+  //           RETURNING userId, isAdmin`,
+  //   values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
+  // };
 
   try {
+    const hash = await bcrypt.hash(password, 10);
+    const query = {
+      text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+              RETURNING userId, isAdmin`,
+      values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
+    };
     const result = await client.query(query.text, query.values);
     // console.log(result);
     const [user] = result.rows;
     const newToken = createToken(user);
+    console.log(verifyToken(newToken));
 
     res.status(201);
     return res.json({
@@ -63,6 +71,7 @@ const signIn = async (req, res) => {
     const result = await client.query(query.text, query.values);
     const [user] = result.rows;
     const newToken = createToken(user);
+    console.log(verifyToken(newToken));
 
     // Return if email is not found
     if (result.rowCount === 0) {
