@@ -1,5 +1,5 @@
+/* eslint-disable max-len */
 const { expect } = require('chai');
-
 const sinon = require('sinon');
 
 const gifController = require('../api/controllers/gifController');
@@ -14,7 +14,7 @@ describe('Gif', () => {
     it('should create a new gif', async () => {
       const req = {
         body: {
-          title: 'Beans',
+          title: 'Hilarious',
           userId: 1,
         },
         image: {
@@ -29,7 +29,7 @@ describe('Gif', () => {
 
       // create a stub to fake the query and server response
       const stubDB = sinon.stub(client, 'query');
-      stubDB.returns(Promise.resolve({ rows: [{ title: 'Beans', gifid: 1, createdon: '2019-11-11' }] }));
+      stubDB.returns(Promise.resolve({ rows: [{ title: 'Hilarious', gifid: 1, createdon: '2019-11-11' }] }));
 
       await gifController.create(req, res);
 
@@ -40,7 +40,7 @@ describe('Gif', () => {
       expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
     });
 
-    it('should handle server error', async () => {
+    it('should handle server error creating new gif', async () => {
       const req = {
         body: {
           title: 'Beans',
@@ -87,7 +87,7 @@ describe('Gif', () => {
       // create a stub to fake the query and server response
       const stubDB = sinon.stub(client, 'query');
       stubDB.returns(Promise.resolve({ rows: [{ comment: 'Beans is good', createdOn: '2019-11-11' }] }));
-      stubDB.withArgs('SELECT title, article FROM articles WHERE (gifId = $1)', [2]).returns(Promise.resolve({ rows: [{ title: 'Beans', article: 'oh beans oh beans' }] }));
+      stubDB.withArgs('SELECT title FROM gifs WHERE (gifId = $1)', [2]).returns(Promise.resolve({ rows: [{ title: 'Beans' }] }));
 
       await gifController.makeComment(req, res);
 
@@ -98,7 +98,7 @@ describe('Gif', () => {
       expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
     });
 
-    it('should handle server error', async () => {
+    it('should handle server error commenting on a gif post', async () => {
       const req = {
         params: { id: '3' },
         body: {
@@ -156,7 +156,7 @@ describe('Gif', () => {
       expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
     });
 
-    it('should handle server error', async () => {
+    it('should handle server error getting a gif', async () => {
       const req = {
         params: { id: '23' },
       };
@@ -180,7 +180,7 @@ describe('Gif', () => {
   });
 
   describe('DELETE /gifs/:id', () => {
-    it('should be able to delete a gif by id', async () => {
+    it('should delete a gif by id', async () => {
       const req = {
         params: { id: '2' },
       };
@@ -202,7 +202,7 @@ describe('Gif', () => {
       expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
     });
 
-    it('should handle server error', async () => {
+    it('should handle server error deleting a gif', async () => {
       const req = {
         params: { id: '2' },
       };
@@ -216,6 +216,53 @@ describe('Gif', () => {
       stubDB.returns(Promise.reject(new Error('error')));
 
       await gifController.remove(req, res);
+
+      // assertions for server error
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(500);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'error');
+    });
+  });
+
+  describe('GET /gifs', () => {
+    it('should get all gifs', async () => {
+      const req = {};
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.withArgs('SELECT gifId, createdOn, title, Imageurl, authorId FROM gifs ORDER BY createdOn DESC', [])
+        .returns(Promise.resolve({
+          rows: [{
+            gifid: 22, title: 'Beans', imageurl: 'http://someURL', createdon: '2019-12-12', authorid: 10,
+          }],
+        }));
+
+      await gifController.getAll(req, res);
+
+      // assertions for successful GET
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(200);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
+    });
+
+    it('should handle server error getting gifs', async () => {
+      const req = {};
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.returns(Promise.reject(new Error('error')));
+
+      await gifController.getAll(req, res);
 
       // assertions for server error
       expect(res.status.calledOnce).to.equal(true);
