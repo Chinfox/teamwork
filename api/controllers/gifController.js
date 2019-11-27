@@ -83,7 +83,49 @@ const makeComment = async (req, res) => {
   }
 };
 
+const getOne = async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+
+  const query1 = {
+    text: 'SELECT * FROM gifs WHERE (gifId = $1)',
+    values: [id],
+  };
+  const query2 = {
+    text: 'SELECT commentId, comment, authorId FROM comments WHERE (gifId = $1)',
+    values: [id],
+  };
+
+  try {
+    const result1 = await client.query(query1.text, query1.values);
+    const result2 = await client.query(query2.text, query2.values);
+
+    const [gif] = result1.rows;
+    const comments = result2.rows;
+
+    res.status(200);
+    return res.json({
+      status: 'success',
+      data: {
+        id: gif.gifid,
+        createdOn: gif.createdon,
+        title: gif.title,
+        url: gif.imageurl,
+        authorId: gif.authorid,
+        comments,
+      },
+    });
+  } catch (error) {
+    console.log();
+    res.status(500);
+    return res.json({
+      status: 'error',
+      error: 'Unable to fetch gif. please retry after a while',
+    });
+  }
+};
+
 module.exports = {
   create,
   makeComment,
+  getOne,
 };
