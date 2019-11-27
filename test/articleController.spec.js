@@ -253,11 +253,6 @@ describe('Article', () => {
     it('should handle server error', async () => {
       const req = {
         params: { id: '23' },
-        body: {
-          title: 'Rice',
-          article: 'Also a food',
-          userId: 12,
-        },
       };
       const res = {
         status: sinon.spy(),
