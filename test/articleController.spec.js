@@ -1,5 +1,5 @@
+/* eslint-disable max-len */
 const { expect } = require('chai');
-
 const sinon = require('sinon');
 
 const articleController = require('../api/controllers/articleController');
@@ -37,7 +37,7 @@ describe('Article', () => {
       expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
     });
 
-    it('should handle server error', async () => {
+    it('should handle server error creating new article', async () => {
       const req = {
         body: {
           title: 'Rice',
@@ -65,7 +65,7 @@ describe('Article', () => {
   });
 
   describe('PATCH /articles/:id', () => {
-    it('should be able to edit an article by id', async () => {
+    it('should edit an article by id', async () => {
       const req = {
         params: { id: '2' },
         body: {
@@ -91,7 +91,7 @@ describe('Article', () => {
       expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
     });
 
-    it('should handle server error', async () => {
+    it('should handle server error editting an article', async () => {
       const req = {
         params: { id: '2' },
         body: {
@@ -119,7 +119,7 @@ describe('Article', () => {
   });
 
   describe('DELETE /articles/:id', () => {
-    it('should be able to delete an article by id', async () => {
+    it('should delete an article by id', async () => {
       const req = {
         params: { id: '2' },
       };
@@ -141,7 +141,7 @@ describe('Article', () => {
       expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
     });
 
-    it('should handle server error', async () => {
+    it('should handle server error deleting an article', async () => {
       const req = {
         params: { id: '2' },
       };
@@ -192,7 +192,7 @@ describe('Article', () => {
       expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
     });
 
-    it('should handle server error', async () => {
+    it('should handle server error commenting on an article', async () => {
       const req = {
         params: { id: '3' },
         body: {
@@ -250,7 +250,7 @@ describe('Article', () => {
       expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
     });
 
-    it('should handle server error', async () => {
+    it('should handle server error fetching an article', async () => {
       const req = {
         params: { id: '23' },
       };
@@ -264,6 +264,53 @@ describe('Article', () => {
       stubDB.returns(Promise.reject(new Error('error')));
 
       await articleController.getOne(req, res);
+
+      // assertions for server error
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(500);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'error');
+    });
+  });
+
+  describe('GET /articles', () => {
+    it('should get all articles', async () => {
+      const req = {};
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.withArgs('SELECT articleId, createdOn, title, article, authorId FROM articles ORDER BY createdOn DESC', [])
+        .returns(Promise.resolve({
+          rows: [{
+            articleid: 22, title: 'Beans', article: 'A beans story', createdon: '2019-02-11', authorid: 1,
+          }],
+        }));
+
+      await articleController.getAll(req, res);
+
+      // assertions for successful GET
+      expect(res.status.calledOnce).to.equal(true);
+      expect(res.json.calledOnce).to.equal(true);
+      expect(res.status.args[0][0]).to.equal(200);
+      expect(res.json.args[0][0]).to.be.an('object').that.has.all.keys('status', 'data');
+    });
+
+    it('should handle server error fetching all articles', async () => {
+      const req = {};
+      const res = {
+        status: sinon.spy(),
+        json: sinon.spy(),
+      };
+
+      // create a stub to fake the query and server response
+      const stubDB = sinon.stub(client, 'query');
+      stubDB.returns(Promise.reject(new Error('error')));
+
+      await articleController.getAll(req, res);
 
       // assertions for server error
       expect(res.status.calledOnce).to.equal(true);
