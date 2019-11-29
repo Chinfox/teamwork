@@ -45,7 +45,7 @@ const createUser = async (req, res) => {
         values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
       };
       return newQuery;
-    });
+    }).catch((error) => console.log('bcrypt bug', error));
     const result = await client.query(query.text, query.values);
     console.log(result);
     const [user] = result.rows;
