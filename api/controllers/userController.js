@@ -47,9 +47,10 @@ const createUser = async (req, res) => {
       return newQuery;
     }).catch((error) => console.log('bcrypt bug', error));
     const result = await client.query(query.text, query.values);
-    console.log(result);
+    console.log('rez', result);
     const [user] = result.rows;
     const newToken = createToken(user);
+    console.log('tok', newToken);
 
     res.status(201);
     return res.json({
