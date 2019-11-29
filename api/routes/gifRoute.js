@@ -2,13 +2,22 @@ const express = require('express');
 
 const router = express.Router();
 
-const gifController = require('../controllers/gifController');
-const { add, remove } = require('../middleware/imageStore');
+const {
+  create,
+  remove,
+  getOne,
+  getAll,
+  makeComment,
+} = require('../controllers/gifController');
 
-router.get('/', gifController.getAll);
-router.post('/', add, gifController.create);
-router.get('/:id', gifController.getOne);
-router.delete('/:id', remove, gifController.remove);
-router.post('/:id/comment', gifController.makeComment);
+const { addCloud, removeCloud } = require('../middleware/imageStore');
+const { gifAuthor } = require('../middleware/authorize');
+const auth = require('../middleware/auth');
+
+router.get('/', auth, getAll);
+router.post('/', auth, addCloud, create);
+router.get('/:id', auth, getOne);
+router.delete('/:id', auth, gifAuthor, removeCloud, remove);
+router.post('/:id/comment', auth, makeComment);
 
 module.exports = router;
