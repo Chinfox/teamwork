@@ -29,6 +29,10 @@ app.use('/api/v1/auth', userRoutes);
 app.use('/api/v1/articles', articleRoutes);
 app.use('/api/v1/gifs', gifRoutes);
 
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('client/build'));
+}
+
 app.use('/', (req, res) => {
   res.json({ message: 'Welcome to the Teamwork API !' });
 });
