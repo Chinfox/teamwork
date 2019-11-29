@@ -4,10 +4,8 @@ const { verifyToken } = require('../lib/tokenManager');
 const auth = (req, res, next) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
-    console.log(token);
-    const decodedToken = verifyToken();
+    const decodedToken = verifyToken(token);
     const { userId, isAdmin } = decodedToken;
-    console.log(decodedToken);
 
     if (req.body.userId && req.body.userId !== userId) {
       res.status(403);
@@ -22,7 +20,7 @@ const auth = (req, res, next) => {
   } catch (error) {
     res.status(401).json({
       status: 'error',
-      error: `Invalid request!${error}`,
+      error: `Invalid request: ${error}`,
     });
   }
 };
