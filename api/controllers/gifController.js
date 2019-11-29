@@ -11,7 +11,7 @@ const create = async (req, res) => {
             RETURNING gifId, title, createdOn, imageUrl`,
     values: [title, imageUrl, dateTime, publicId, userId],
   };
-  console.log(query);
+
   try {
     const result = await client.query(query.text, query.values);
     const [data] = result.rows;
@@ -28,7 +28,6 @@ const create = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log();
     res.status(500);
     return res.json({
       status: 'error',
@@ -57,12 +56,11 @@ const makeComment = async (req, res) => {
   try {
     const result1 = await client.query(query1.text, query1.values);
     const result2 = await client.query(query2.text, query2.values);
-    // const result2 = await client.query('SELECT FROM WHERE (articleId = $1)', [id]);
-    // console.log(result1);
-    // console.log(result2);
+
     const [commentData] = result1.rows;
     const [gifData] = result2.rows;
 
+    // Return if gif is not found
     if (result2.rowCount === 0) {
       res.status(404);
       return res.json({
@@ -82,7 +80,6 @@ const makeComment = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log();
     res.status(500);
     return res.json({
       status: 'error',
@@ -131,7 +128,6 @@ const getOne = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log();
     res.status(500);
     return res.json({
       status: 'error',
@@ -147,7 +143,6 @@ const remove = async (req, res) => {
     text: 'DELETE FROM gifs WHERE gifId = $1',
     values: [id],
   };
-  // console.log(id);
   try {
     await client.query(query.text, query.values);
 
@@ -159,7 +154,6 @@ const remove = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log();
     res.status(500);
     return res.json({
       status: 'error',
@@ -186,7 +180,6 @@ const getAll = async (req, res) => {
       data: gifs,
     });
   } catch (error) {
-    console.log();
     res.status(500);
     return res.json({
       status: 'error',

@@ -10,7 +10,7 @@ cloudinary.config({
 });
 
 // eslint-disable-next-line consistent-return
-const add = async (req, res, next) => {
+const addCloud = async (req, res, next) => {
   const file = req.files.image;
 
 
@@ -23,12 +23,10 @@ const add = async (req, res, next) => {
   }
   cloudinary.uploader.upload(file.tempFilePath)
     .then((image) => {
-      console.log('imageR: ', image);
       req.image = image;
       return next();
     })
-    .catch((error) => {
-      console.log('errorR', error);
+    .catch(() => {
       res.status(500);
       return res.json({
         status: 'error',
@@ -37,14 +35,14 @@ const add = async (req, res, next) => {
     });
 };
 
-const remove = async (req, res, next) => {
-  cloudinary.uploader.destroy(req.body.publicId)
+const removeCloud = async (req, res, next) => {
+  const { publicId } = req.body;
+  cloudinary.uploader.destroy(publicId)
     .then((result) => {
       console.log(`image in cloud deleted: ${result}`);
       return next();
     })
-    .catch((error) => {
-      console.log('errorR', error);
+    .catch(() => {
       res.status(500);
       return res.json({
         status: 'error',
@@ -54,6 +52,6 @@ const remove = async (req, res, next) => {
 };
 
 module.exports = {
-  add,
-  remove,
+  addCloud,
+  removeCloud,
 };

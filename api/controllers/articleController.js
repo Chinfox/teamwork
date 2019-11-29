@@ -29,7 +29,6 @@ const create = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log();
     res.status(500);
     return res.json({
       status: 'error',
@@ -42,7 +41,6 @@ const edit = async (req, res) => {
   const { title, article } = req.body;
   const id = parseInt(req.params.id, 10);
   const dateTime = new Date().toLocaleString();
-  // const authorId = verifyToken();
 
   const query = {
     text: `UPDATE articles SET title = $1, article = $2, updatedOn = $3 WHERE articleId = $4
@@ -52,7 +50,6 @@ const edit = async (req, res) => {
 
   try {
     const result = await client.query(query.text, query.values);
-    // console.log(result);
     const [data] = result.rows;
 
     res.status(200);
@@ -65,7 +62,6 @@ const edit = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log();
     res.status(500);
     return res.json({
       status: 'error',
@@ -81,7 +77,7 @@ const remove = async (req, res) => {
     text: 'DELETE FROM articles WHERE articleId = $1',
     values: [id],
   };
-  // console.log(id);
+
   try {
     await client.query(query.text, query.values);
 
@@ -93,7 +89,6 @@ const remove = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log();
     res.status(500);
     return res.json({
       status: 'error',
@@ -122,9 +117,7 @@ const makeComment = async (req, res) => {
   try {
     const result1 = await client.query(query1.text, query1.values);
     const result2 = await client.query(query2.text, query2.values);
-    // const result2 = await client.query('SELECT FROM WHERE (articleId = $1)', [id]);
-    // console.log(result1);
-    // console.log(result2);
+
     const [commentData] = result1.rows;
     const [articleData] = result2.rows;
 
@@ -149,7 +142,6 @@ const makeComment = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log();
     res.status(500);
     return res.json({
       status: 'error',
@@ -198,7 +190,6 @@ const getOne = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log();
     res.status(500);
     return res.json({
       status: 'error',
@@ -225,7 +216,6 @@ const getAll = async (req, res) => {
       data: articles,
     });
   } catch (error) {
-    console.log();
     res.status(500);
     return res.json({
       status: 'error',

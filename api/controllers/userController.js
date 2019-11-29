@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 const bcrypt = require('bcrypt');
 const client = require('../db/connector');
-const { createToken } = require('../lib/token');
+const { createToken } = require('../lib/tokenManager');
 
 const createUser = async (req, res) => {
   const {
@@ -28,18 +28,28 @@ const createUser = async (req, res) => {
   // };
 
   try {
-    const hash = await bcrypt.hash(password, 10);
-    const query = {
-      text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
-              VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-              RETURNING userId, isAdmin`,
-      values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
-    };
+    // const hash = await bcrypt.hash(password, 10);
+    // const query = {
+    //   text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
+    //           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    //           RETURNING userId, isAdmin`,
+    //   values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
+    // };
+    // const result = await client.query(query.text, query.values);
+
+    const query = await bcrypt.hash(password, 10).then((hash) => {
+      const newQuery = {
+        text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                RETURNING userId, isAdmin`,
+        values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
+      };
+      return newQuery;
+    });
     const result = await client.query(query.text, query.values);
-    // console.log(result);
+    console.log(result);
     const [user] = result.rows;
     const newToken = createToken(user);
-    // console.log(verifyToken(newToken));
 
     res.status(201);
     return res.json({
