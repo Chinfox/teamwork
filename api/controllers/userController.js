@@ -11,46 +11,19 @@ const createUser = async (req, res) => {
   // convert email to lowercase to avoid query errors
   const userEmail = email.toLowerCase();
 
-  // encrypt password
-  // const hash = await bcrypt.hash(password, 10);
-  // let hash;
-  // await bcrypt.hash(password, 10)
-  //   .then((PasswordHash) => {
-  //     hash = PasswordHash;
-  //     return hash;
-  //   });
-
-  // const query = {
-  //   text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
-  //           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-  //           RETURNING userId, isAdmin`,
-  //   values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
-  // };
-
   try {
-    // const hash = await bcrypt.hash(password, 10);
-    // const query = {
-    //   text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
-    //           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    //           RETURNING userId, isAdmin`,
-    //   values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
-    // };
-    // const result = await client.query(query.text, query.values);
-
-    const query = await bcrypt.hash(password, 10).then((hash) => {
-      const newQuery = {
-        text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                RETURNING userId, isAdmin`,
-        values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
-      };
-      return newQuery;
-    }).catch((error) => console.log('bcrypt bug', error));
+    // Encrypt password
+    const hash = await bcrypt.hash(password, 10);
+    const query = {
+      text: `INSERT INTO users (firstName, lastName, email, password, gender, jobRole, department, address)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+              RETURNING userId, isAdmin`,
+      values: [firstName, lastName, userEmail, hash, gender, jobRole, department, address],
+    };
     const result = await client.query(query.text, query.values);
-    console.log('rez', result);
+
     const [user] = result.rows;
     const newToken = createToken(user);
-    console.log('tok', newToken);
 
     res.status(201);
     return res.json({
@@ -62,11 +35,10 @@ const createUser = async (req, res) => {
       },
     });
   } catch (error) {
-    // console.log(error);
     res.status(500);
     return res.json({
       status: 'error',
-      error: 'Unable to create a user account please retry after a while',
+      error: `Unable to create a user account: ${error.detail}`,
     });
   }
 };
@@ -81,9 +53,6 @@ const signIn = async (req, res) => {
 
   try {
     const result = await client.query(query.text, query.values);
-    const [user] = result.rows;
-    const newToken = createToken(user);
-    // console.log(verifyToken(newToken));
 
     // Return if email is not found
     if (result.rowCount === 0) {
@@ -93,7 +62,10 @@ const signIn = async (req, res) => {
         error: 'User email not registered',
       });
     }
+    const [user] = result.rows;
+    const newToken = createToken(user);
 
+    // Check password if user account exists
     await bcrypt.compare(password, user.password)
       .then((valid) => {
         // Password invalid
@@ -127,23 +99,3 @@ module.exports = {
   createUser,
   signIn,
 };
-
-// .then((valid) => {
-//   // Password valid
-//   res.status(200);
-//   return res.json({
-//     status: 'success',
-//     data: {
-//       token: newToken,
-//       userId: user.userid,
-//     },
-//   });
-// })
-// .catch(() => {
-//   // Password invalid
-//   res.status(401);
-//   return res.json({
-//     status: 'error',
-//     error: 'Password not correct',
-//   });
-// });
