@@ -3,9 +3,10 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 
 dotenv.config();
-const secret = process.env.SECRET_KEY;
+const secret = process.env.SECRET_KEY || 'secret';
 
 const createToken = (user) => {
+  console.log('this is my secret');
   const token = jwt.sign(
     { userId: user.userid, isAdmin: user.isadmin },
     secret,
