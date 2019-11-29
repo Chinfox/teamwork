@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "An internal social network API for employees of an organization",
   "engines": {
-    "node": "10.x"
+    "node": "10.16.x"
   },
   "main": "server.js",
   "scripts": {
