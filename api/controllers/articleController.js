@@ -1,19 +1,19 @@
 const client = require('../db/connector');
 
 const create = async (req, res) => {
-  const { title, article, userId } = req.body;
-
-  const dateTime = new Date().toLocaleString();
-  // const authorId = verifyToken();
-
-  const query = {
-    text: `INSERT INTO articles (title, article, createdOn, authorId)
-            VALUES ($1, $2, $3, $4)
-            RETURNING articleId, title, createdOn`,
-    values: [title, article, dateTime, userId],
-  };
-
   try {
+    const { title, article, userId } = req.body;
+
+    const dateTime = new Date().toLocaleString();
+    // const authorId = verifyToken();
+
+    const query = {
+      text: `INSERT INTO articles (title, article, createdOn, authorId)
+              VALUES ($1, $2, $3, $4)
+              RETURNING articleId, title, createdOn`,
+      values: [title, article, dateTime, userId],
+    };
+
     const result = await client.query(query.text, query.values);
     // console.log(result);
     const [data] = result.rows;
@@ -38,17 +38,17 @@ const create = async (req, res) => {
 };
 
 const edit = async (req, res) => {
-  const { title, article } = req.body;
-  const id = parseInt(req.params.id, 10);
-  const dateTime = new Date().toLocaleString();
-
-  const query = {
-    text: `UPDATE articles SET title = $1, article = $2, updatedOn = $3 WHERE articleId = $4
-          RETURNING title, article`,
-    values: [title, article, dateTime, id],
-  };
-
   try {
+    const { title, article } = req.body;
+    const id = parseInt(req.params.id, 10);
+    const dateTime = new Date().toLocaleString();
+
+    const query = {
+      text: `UPDATE articles SET title = $1, article = $2, updatedOn = $3 WHERE articleId = $4
+            RETURNING title, article`,
+      values: [title, article, dateTime, id],
+    };
+
     const result = await client.query(query.text, query.values);
     const [data] = result.rows;
 
@@ -71,14 +71,14 @@ const edit = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  const id = parseInt(req.params.id, 10);
-
-  const query = {
-    text: 'DELETE FROM articles WHERE articleId = $1',
-    values: [id],
-  };
-
   try {
+    const id = parseInt(req.params.id, 10);
+
+    const query = {
+      text: 'DELETE FROM articles WHERE articleId = $1',
+      values: [id],
+    };
+
     await client.query(query.text, query.values);
 
     res.status(200);
@@ -98,23 +98,23 @@ const remove = async (req, res) => {
 };
 
 const makeComment = async (req, res) => {
-  const { comment, userId } = req.body;
-  const id = parseInt(req.params.id, 10);
-  const dateTime = new Date().toLocaleString();
-
-  const query1 = {
-    text: `INSERT INTO comments (comment, articleId, createdOn, authorId)
-            VALUES ($1, $2, $3, $4)
-            RETURNING comment, createdOn`,
-    values: [comment, id, dateTime, userId],
-  };
-
-  const query2 = {
-    text: 'SELECT title, article FROM articles WHERE (articleId = $1)',
-    values: [id],
-  };
-
   try {
+    const { comment, userId } = req.body;
+    const id = parseInt(req.params.id, 10);
+    const dateTime = new Date().toLocaleString();
+
+    const query1 = {
+      text: `INSERT INTO comments (comment, articleId, createdOn, authorId)
+              VALUES ($1, $2, $3, $4)
+              RETURNING comment, createdOn`,
+      values: [comment, id, dateTime, userId],
+    };
+
+    const query2 = {
+      text: 'SELECT title, article FROM articles WHERE (articleId = $1)',
+      values: [id],
+    };
+
     const result1 = await client.query(query1.text, query1.values);
     const result2 = await client.query(query2.text, query2.values);
 
@@ -151,18 +151,18 @@ const makeComment = async (req, res) => {
 };
 
 const getOne = async (req, res) => {
-  const id = parseInt(req.params.id, 10);
-
-  const query1 = {
-    text: 'SELECT * FROM articles WHERE (articleId = $1)',
-    values: [id],
-  };
-  const query2 = {
-    text: 'SELECT commentId, comment, authorId FROM comments WHERE (articleId = $1)',
-    values: [id],
-  };
-
   try {
+    const id = parseInt(req.params.id, 10);
+
+    const query1 = {
+      text: 'SELECT * FROM articles WHERE (articleId = $1)',
+      values: [id],
+    };
+    const query2 = {
+      text: 'SELECT commentId, comment, authorId FROM comments WHERE (articleId = $1)',
+      values: [id],
+    };
+
     const result1 = await client.query(query1.text, query1.values);
     const result2 = await client.query(query2.text, query2.values);
 
@@ -199,12 +199,12 @@ const getOne = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
-  const query = {
-    text: 'SELECT articleId, createdOn, title, article, authorId FROM articles ORDER BY createdOn DESC',
-    values: [],
-  };
-
   try {
+    const query = {
+      text: 'SELECT articleId, createdOn, title, article, authorId FROM articles ORDER BY createdOn DESC',
+      values: [],
+    };
+
     const result = await client.query(query.text, query.values);
 
     // Array of article data

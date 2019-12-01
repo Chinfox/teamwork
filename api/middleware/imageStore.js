@@ -11,44 +11,51 @@ cloudinary.config({
 
 // eslint-disable-next-line consistent-return
 const addCloud = async (req, res, next) => {
-  const file = req.files.image;
+  try {
+    const { image } = req.files;
 
-
-  if (file.mimetype !== 'image/gif') {
-    res.status(400);
-    return res.json({
-      status: 'error',
-      error: 'You can only upload a gif file',
-    });
-  }
-  cloudinary.uploader.upload(file.tempFilePath)
-    .then((image) => {
-      req.image = image;
-      return next();
-    })
-    .catch(() => {
-      res.status(500);
+    // Image not uploaded
+    if (!image) {
+      res.status(400);
       return res.json({
         status: 'error',
-        error: 'Gif upload failed please retry after a while',
+        error: 'No image found!',
       });
+    }
+
+    if (image.mimetype !== 'image/gif') {
+      res.status(400);
+      return res.json({
+        status: 'error',
+        error: 'You can only upload a gif file',
+      });
+    }
+
+    const imageData = await cloudinary.uploader.upload(image.tempFilePath);
+    req.image = imageData;
+    return next();
+  } catch (error) {
+    res.status(500);
+    return res.json({
+      status: 'error',
+      error: 'Gif upload failed please retry after a while',
     });
+  }
 };
 
 const removeCloud = async (req, res, next) => {
-  const { publicId } = req.body;
-  cloudinary.uploader.destroy(publicId)
-    .then((result) => {
-      console.log(`image in cloud deleted: ${result}`);
-      return next();
-    })
-    .catch(() => {
-      res.status(500);
-      return res.json({
-        status: 'error',
-        error: 'Gif delete failed please retry after a while',
-      });
+  try {
+    const { publicId } = req.body;
+    const result = await cloudinary.uploader.destroy(publicId);
+    console.log(`image in cloud deleted: ${result}`);
+    return next();
+  } catch (error) {
+    res.status(500);
+    return res.json({
+      status: 'error',
+      error: 'Gif delete failed please retry after a while',
     });
+  }
 };
 
 module.exports = {
