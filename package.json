@@ -5,9 +5,9 @@
   "engines": {
     "node": "10.16.x"
   },
-  "main": "api/app.js",
+  "main": "./api/app.js",
   "scripts": {
-    "start": "node api/app.js",
+    "start": "node ./api/app.js",
     "setup-db": "node ./api/db/setup.js",
     "start-dev": "nodemon app.js",
     "test:mocha": "mocha test/**/*.spec.js --exit",
