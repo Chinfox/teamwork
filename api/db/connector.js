@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-const pg = require('pg');
+// const pg = require('pg');
 const { Pool } = require('pg');
 const dotenv = require('dotenv');
 
@@ -35,6 +35,7 @@ const con = async () => {
       }
       console.log('Database Connected');
     });
+    return client;
   } catch (error) {
     console.log(error);
   }
@@ -43,4 +44,4 @@ const con = async () => {
 con();
 // });
 
-// module.exports = client;
+module.exports = con;
