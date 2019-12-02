@@ -9,7 +9,7 @@ let pool;
 if (process.env.NODE_ENV === 'production') {
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    // ssl: true,
+    ssl: true,
   });
 } else {
   pool = new Pool({
@@ -20,19 +20,27 @@ if (process.env.NODE_ENV === 'production') {
     port: process.env.PGPORT,
   });
 }
+const con = async () => {
+  try {
+  // const client = new pg.Client(pool);
+    const client = await pool.connect();
 
-const client = new pg.Client(pool);
-
-client.connect((err) => {
-  if (err) {
-    return console.error('could not connect to postgres', err);
+    // client.connect((err) => {
+    // if (err) {
+    //   return console.error('could not connect to postgres', err);
+    // }
+    client.query('SELECT NOW() AS "theTime"', (error) => {
+      if (error) {
+        return console.error('error running query', error);
+      }
+      console.log('Database Connected');
+    });
+  } catch (error) {
+    console.log(error);
   }
-  client.query('SELECT NOW() AS "theTime"', (error) => {
-    if (error) {
-      return console.error('error running query', error);
-    }
-    console.log('Database Connected');
-  });
-});
+};
 
-module.exports = client;
+con();
+// });
+
+// module.exports = client;
