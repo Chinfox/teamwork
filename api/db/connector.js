@@ -9,7 +9,7 @@ let pool;
 if (process.env.NODE_ENV === 'production') {
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: true,
+    // ssl: true,
   });
 } else {
   pool = new Pool({
