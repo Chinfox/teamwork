@@ -20,28 +20,21 @@ if (process.env.NODE_ENV === 'production') {
     port: process.env.PGPORT,
   });
 }
-const con = async () => {
+const testDatabase = async () => {
   try {
   // const client = new pg.Client(pool);
     const client = await pool.connect();
-
-    // client.connect((err) => {
-    // if (err) {
-    //   return console.error('could not connect to postgres', err);
-    // }
     client.query('SELECT NOW() AS "theTime"', (error) => {
       if (error) {
         return console.error('error running query', error);
       }
       console.log('Database Connected');
     });
-    return client;
   } catch (error) {
     console.log(error);
   }
 };
 
-con();
-// });
+testDatabase();
 
-module.exports = con;
+module.exports = pool;

@@ -50,7 +50,7 @@ const signIn = async (req, res) => {
       text: 'SELECT userId, password, isAdmin FROM users WHERE (email = $1)',
       values: [email],
     };
-
+    // const client = await pool.connect();
     const result = await client.query(query.text, query.values);
 
     // Return if email is not found
@@ -89,7 +89,7 @@ const signIn = async (req, res) => {
     res.status(500);
     return res.json({
       status: 'error',
-      error: 'Signin not successful. Please retry after a while',
+      error: `Signin not successful. Please retry after a while ${error}`,
     });
   }
 };

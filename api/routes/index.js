@@ -49,22 +49,22 @@ router.post('/v1/gifs/:id/comment', auth, gifController.makeComment);
  */
 
 // Get all articles
-router.get('/', auth, articleController.getAll);
+router.get('/v1/articles', auth, articleController.getAll);
 
 // Create an article
-router.post('/', auth, articleController.create);
+router.post('/v1/articles', auth, articleController.create);
 
 // Get one article
-router.get('/:id', auth, articleController.getOne);
+router.get('/v1/articles/:id', auth, articleController.getOne);
 
 // Edit one article
-router.patch('/:id', auth, articleAuthor, articleController.edit);
+router.patch('/v1/articles/:id', auth, articleAuthor, articleController.edit);
 
 // Delete one article
-router.delete('/:id', auth, articleAuthor, articleController.remove);
+router.delete('/v1/articles/:id', auth, articleAuthor, articleController.remove);
 
 // Comment on an article
-router.post('/:id/comment', auth, articleController.makeComment);
+router.post('/v1/articles/:id/comment', auth, articleController.makeComment);
 
 
 router.get('/', (req, res) => {
