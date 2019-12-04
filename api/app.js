@@ -3,14 +3,15 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const dotenv = require('dotenv');
+// const path = require('path');
+
+const routes = require('./routes/index');
 
 dotenv.config();
 
+// process.NODE_ENV = 'production';
 const app = express();
 const port = process.env.PORT || '4000';
-const userRoutes = require('./api/routes/userRoute');
-const articleRoutes = require('./api/routes/articleRoute');
-const gifRoutes = require('./api/routes/gifRoute');
 
 app.use(cors());
 
@@ -25,9 +26,12 @@ app.use(fileUpload({
   useTempFiles: true,
 }));
 
-app.use('/api/v1/auth', userRoutes);
-app.use('/api/v1/articles', articleRoutes);
-app.use('/api/v1/gifs', gifRoutes);
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static(path.join(__dirname, '/api')));
+// }
+// app.use('/api/v1', express.static(path.join(__dirname, 'api')));
+
+app.use('/api', routes);
 
 app.use('/', (req, res) => {
   res.json({ message: 'Welcome to the Teamwork API !' });

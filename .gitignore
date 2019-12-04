@@ -14,3 +14,6 @@ bash.exe.stackdump
 archive
 
 api/db/setup.js
+api/routes/articleRouter.js
+api/routes/gifRouter.js
+api/routes/userRouter.js

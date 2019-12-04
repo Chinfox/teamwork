@@ -1,18 +1,18 @@
 const client = require('../db/connector');
 
 const create = async (req, res) => {
-  const { title, userId } = req.body;
-  const { public_id: publicId, secure_url: imageUrl } = req.image;
-  const dateTime = new Date().toLocaleString();
-
-  const query = {
-    text: `INSERT INTO gifs (title, imageUrl, createdOn, publicId, authorId)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING gifId, title, createdOn, imageUrl`,
-    values: [title, imageUrl, dateTime, publicId, userId],
-  };
-
   try {
+    const { title, userId } = req.body;
+    const { public_id: publicId, secure_url: imageUrl } = req.image;
+    const dateTime = new Date().toLocaleString();
+
+    const query = {
+      text: `INSERT INTO gifs (title, imageUrl, createdOn, publicId, authorId)
+              VALUES ($1, $2, $3, $4, $5)
+              RETURNING gifId, title, createdOn, imageUrl`,
+      values: [title, imageUrl, dateTime, publicId, userId],
+    };
+
     const result = await client.query(query.text, query.values);
     const [data] = result.rows;
 
@@ -37,23 +37,23 @@ const create = async (req, res) => {
 };
 
 const makeComment = async (req, res) => {
-  const { comment, userId } = req.body;
-  const id = parseInt(req.params.id, 10);
-  const dateTime = new Date().toLocaleString();
-
-  const query1 = {
-    text: `INSERT INTO comments (comment, gifId, createdOn, authorId)
-            VALUES ($1, $2, $3, $4)
-            RETURNING comment, createdOn`,
-    values: [comment, id, dateTime, userId],
-  };
-
-  const query2 = {
-    text: 'SELECT title FROM gifs WHERE (gifId = $1)',
-    values: [id],
-  };
-
   try {
+    const { comment, userId } = req.body;
+    const id = parseInt(req.params.id, 10);
+    const dateTime = new Date().toLocaleString();
+
+    const query1 = {
+      text: `INSERT INTO comments (comment, gifId, createdOn, authorId)
+              VALUES ($1, $2, $3, $4)
+              RETURNING comment, createdOn`,
+      values: [comment, id, dateTime, userId],
+    };
+
+    const query2 = {
+      text: 'SELECT title FROM gifs WHERE (gifId = $1)',
+      values: [id],
+    };
+
     const result1 = await client.query(query1.text, query1.values);
     const result2 = await client.query(query2.text, query2.values);
 
@@ -89,18 +89,18 @@ const makeComment = async (req, res) => {
 };
 
 const getOne = async (req, res) => {
-  const id = parseInt(req.params.id, 10);
-
-  const query1 = {
-    text: 'SELECT * FROM gifs WHERE (gifId = $1)',
-    values: [id],
-  };
-  const query2 = {
-    text: 'SELECT commentId, comment, authorId FROM comments WHERE (gifId = $1)',
-    values: [id],
-  };
-
   try {
+    const id = parseInt(req.params.id, 10);
+
+    const query1 = {
+      text: 'SELECT * FROM gifs WHERE (gifId = $1)',
+      values: [id],
+    };
+    const query2 = {
+      text: 'SELECT commentId, comment, authorId FROM comments WHERE (gifId = $1)',
+      values: [id],
+    };
+
     const result1 = await client.query(query1.text, query1.values);
     const result2 = await client.query(query2.text, query2.values);
 
@@ -137,13 +137,14 @@ const getOne = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  const id = parseInt(req.params.id, 10);
-
-  const query = {
-    text: 'DELETE FROM gifs WHERE gifId = $1',
-    values: [id],
-  };
   try {
+    const id = parseInt(req.params.id, 10);
+
+    const query = {
+      text: 'DELETE FROM gifs WHERE gifId = $1',
+      values: [id],
+    };
+
     await client.query(query.text, query.values);
 
     res.status(200);
@@ -163,12 +164,12 @@ const remove = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
-  const query = {
-    text: 'SELECT gifId, createdOn, title, Imageurl, authorId FROM gifs ORDER BY createdOn DESC',
-    values: [],
-  };
-
   try {
+    const query = {
+      text: 'SELECT gifId, createdOn, title, Imageurl, authorId FROM gifs ORDER BY createdOn DESC',
+      values: [],
+    };
+
     const result = await client.query(query.text, query.values);
 
     // Array of gif data

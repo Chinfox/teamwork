@@ -14,11 +14,12 @@ const admin = async (req, res, next) => {
 };
 
 const gifAuthor = async (req, res, next) => {
-  const id = parseInt(req.params.id, 10);
-  const { userId } = req.body;
-
   try {
+    const id = parseInt(req.params.id, 10);
+    const { userId } = req.body;
+
     const result = await client.query('SELECT authorId, publicId FROM gifs WHERE (gifId = $1)', [id]);
+
     if (result.rowCount === 0) {
       res.status(404);
       return res.json({
@@ -26,6 +27,7 @@ const gifAuthor = async (req, res, next) => {
         error: 'Gif does not exist',
       });
     }
+
     const [{ authorid, publicid }] = result.rows;
 
     if (userId !== authorid) {
@@ -35,6 +37,7 @@ const gifAuthor = async (req, res, next) => {
         error: 'You can only delete your own gifs!',
       });
     }
+
     req.body.publicId = publicid;
     return next();
   } catch (error) {
@@ -47,12 +50,12 @@ const gifAuthor = async (req, res, next) => {
 };
 
 const articleAuthor = async (req, res, next) => {
-  const id = parseInt(req.params.id, 10);
-  const { userId } = req.body;
-
   try {
+    const id = parseInt(req.params.id, 10);
+    const { userId } = req.body;
     const result = await client.query('SELECT authorId FROM articles WHERE (articleId = $1)', [id]);
-    const [{ authorid }] = result.rows;
+
+
     if (result.rowCount === 0) {
       res.status(404);
       return res.json({
@@ -60,6 +63,9 @@ const articleAuthor = async (req, res, next) => {
         error: 'Article does not exist',
       });
     }
+
+    const [{ authorid }] = result.rows;
+
     if (userId !== authorid) {
       res.status(403);
       return res.json({
@@ -67,6 +73,7 @@ const articleAuthor = async (req, res, next) => {
         error: 'You can only edit or delete your own articles!',
       });
     }
+
     return next();
   } catch (error) {
     res.status(500);

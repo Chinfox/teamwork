@@ -1,17 +1,15 @@
-/* eslint-disable max-len */
 const bcrypt = require('bcrypt');
 const client = require('../db/connector');
 const { createToken } = require('../lib/tokenManager');
 
 const createUser = async (req, res) => {
-  const {
-    firstName, lastName, email, password, gender, jobRole, department, address,
-  } = req.body;
-
-  // convert email to lowercase to avoid query errors
-  const userEmail = email.toLowerCase();
-
   try {
+    const {
+      firstName, lastName, email, password, gender, jobRole, department, address,
+    } = req.body;
+
+    // convert email to lowercase to avoid query errors
+    const userEmail = email.toLowerCase();
     // Encrypt password
     const hash = await bcrypt.hash(password, 10);
     const query = {
@@ -45,13 +43,13 @@ const createUser = async (req, res) => {
 
 // eslint-disable-next-line consistent-return
 const signIn = async (req, res) => {
-  const { email, password } = req.body;
-  const query = {
-    text: 'SELECT userId, password, isAdmin FROM users WHERE (email = $1)',
-    values: [email],
-  };
-
   try {
+    const { email, password } = req.body;
+    const query = {
+      text: 'SELECT userId, password, isAdmin FROM users WHERE (email = $1)',
+      values: [email],
+    };
+    // const client = await pool.connect();
     const result = await client.query(query.text, query.values);
 
     // Return if email is not found
@@ -90,7 +88,7 @@ const signIn = async (req, res) => {
     res.status(500);
     return res.json({
       status: 'error',
-      error: 'Signin not successful. Please retry after a while',
+      error: `Signin not successful. Please retry after a while ${error}`,
     });
   }
 };
