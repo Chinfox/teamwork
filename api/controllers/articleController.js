@@ -34,8 +34,6 @@ const create = async (req, res) => {
       status: 'error',
       error: 'Unable to create article. please retry after a while',
     });
-  } finally {
-    client.release();
   }
 };
 
@@ -69,8 +67,6 @@ const edit = async (req, res) => {
       status: 'error',
       error: 'Unable to edit article. please retry after a while',
     });
-  } finally {
-    client.release();
   }
 };
 
@@ -98,8 +94,6 @@ const remove = async (req, res) => {
       status: 'error',
       error: 'Unable to delete article. please retry after a while',
     });
-  } finally {
-    client.release();
   }
 };
 
@@ -153,8 +147,6 @@ const makeComment = async (req, res) => {
       status: 'error',
       error: 'Unable to post comment. please retry after a while',
     });
-  } finally {
-    client.release();
   }
 };
 
@@ -203,8 +195,6 @@ const getOne = async (req, res) => {
       status: 'error',
       error: 'Unable to fetch article. please retry after a while',
     });
-  } finally {
-    client.release();
   }
 };
 
@@ -231,8 +221,6 @@ const getAll = async (req, res) => {
       status: 'error',
       error: 'Unable to fetch all articles. please retry after a while',
     });
-  } finally {
-    client.release();
   }
 };
 

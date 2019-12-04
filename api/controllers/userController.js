@@ -38,8 +38,6 @@ const createUser = async (req, res) => {
       status: 'error',
       error: `Unable to create a user account: ${error.detail}`,
     });
-  } finally {
-    client.release();
   }
 };
 
@@ -92,8 +90,6 @@ const signIn = async (req, res) => {
       status: 'error',
       error: `Signin not successful. Please retry after a while ${error}`,
     });
-  } finally {
-    client.release();
   }
 };
 

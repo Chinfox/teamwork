@@ -33,8 +33,6 @@ const create = async (req, res) => {
       status: 'error',
       error: 'Unable to create gif. please retry after a while',
     });
-  } finally {
-    client.release();
   }
 };
 
@@ -87,8 +85,6 @@ const makeComment = async (req, res) => {
       status: 'error',
       error: 'Unable to post comment. please retry after a while',
     });
-  } finally {
-    client.release();
   }
 };
 
@@ -137,8 +133,6 @@ const getOne = async (req, res) => {
       status: 'error',
       error: 'Unable to fetch gif. please retry after a while',
     });
-  } finally {
-    client.release();
   }
 };
 
@@ -166,8 +160,6 @@ const remove = async (req, res) => {
       status: 'error',
       error: 'Unable to delete gif. please retry after a while',
     });
-  } finally {
-    client.release();
   }
 };
 
@@ -194,8 +186,6 @@ const getAll = async (req, res) => {
       status: 'error',
       error: 'Unable to fetch all gifs. please retry after a while',
     });
-  } finally {
-    client.release();
   }
 };
 
