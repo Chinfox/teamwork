@@ -21,9 +21,9 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 const testDatabase = async () => {
+  const client = await pool.connect();
   try {
   // const client = new pg.Client(pool);
-    const client = await pool.connect();
     client.query('SELECT NOW() AS "theTime"', (error) => {
       if (error) {
         return console.error('error running query', error);
@@ -32,6 +32,8 @@ const testDatabase = async () => {
     });
   } catch (error) {
     console.log(error);
+  } finally {
+    client.release();
   }
 };
 
